@@ -1,0 +1,16 @@
+db:
+  image: postgres
+  environment:
+    POSTGRES_PASSWORD: postgres
+    POSTGRES_USER: postgres
+
+app:
+  build: .
+  environment:
+    PGHOST: db
+    PGPORT: 5432
+    ENV: Docker
+  ports:
+    - 8081:8081
+  links:
+    - db
