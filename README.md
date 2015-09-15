@@ -57,3 +57,15 @@ curl -i -X POST -d @minion-post.json http://localhost:8081/minions --header "Con
 ```
 curl -i -X GET http://localhost:8081/minions
 ```
+
+## Testing
+
+```
+./scripts/test.sh
+```
+
+  or
+
+```
+stack test
+```
