@@ -1,0 +1,113 @@
+-- The name of the package.
+name:                minionsApi
+
+-- The package version.  See the Haskell package versioning policy (PVP)
+-- for standards guiding when and how versions should be incremented.
+-- http://www.haskell.org/haskellwiki/Package_versioning_policy
+--                   | | | +--- code changes with no API change
+version:             0.1.0.0
+
+-- A short (one-line) description of the package.
+synopsis: A very cool MinionsApi API
+
+-- A longer description of the package.
+description: Serves bananas to minions
+
+-- The license under which the package is released.
+-- license:
+
+-- The file containing the license text.
+-- license-file:        LICENSE
+
+-- The package author(s).
+author:              Daniel Stankevich
+
+-- An email address to which users can send suggestions, bug reports, and
+-- patches.
+maintainer:          hello@example.com
+
+-- A copyright notice.
+-- copyright:
+
+category:            Web
+
+build-type:          Simple
+
+-- Extra files to be distributed with the package, such as examples or a
+-- README.
+-- extra-source-files:
+
+-- Constraint on the version of Cabal needed to build this package.
+cabal-version:       >=1.10
+
+
+executable minionsApi
+  -- .hs or .lhs file containing the Main module.
+  main-is: Main.hs
+
+  -- Modules included in this executable, other than Main.
+  -- other-modules:
+
+  -- LANGUAGE extensions used by modules in this package.
+  -- other-extensions:
+
+  -- Other library packages from which modules are imported.
+  build-depends: base
+               , warp
+               , minionsApi
+
+  -- Directories containing source files.
+  hs-source-dirs: src/
+
+  -- Base language which the package is written in.
+  default-language:    Haskell2010
+
+library
+  default-language:    Haskell2010
+  hs-source-dirs:      src/lib
+  ghc-options:         -Wall
+
+  Exposed-modules:     MinionsApi.Middlewares,
+                       MinionsApi.Config,
+                       MinionsApi.Schema,
+                       MinionsApi.Service
+
+  build-depends:       base
+                     , wai
+                     , wai-cors
+                     , wai-extra
+                     , aeson
+                     , bytestring
+                     , conduit
+                     , conduit-extra
+                     , either
+                     , http-types
+                     , lifted-base
+                     , monad-logger
+                     , mtl
+                     , persistent
+                     , persistent-postgresql
+                     , persistent-sqlite
+                     , persistent-template
+                     , servant
+                     , servant-server
+                     , time
+                     , text
+                     , transformers
+                     , monad-control
+                     , heroku-persistent
+
+Test-Suite test
+  type:                exitcode-stdio-1.0
+  main-is:             Main.hs
+  hs-source-dirs:      test/
+  ghc-options:         -Wall
+
+  build-depends:       base,
+                       wai,
+                       warp,
+                       hspec,
+                       hspec-wai,
+                       minionsApi
+
+  default-language:    Haskell2010
