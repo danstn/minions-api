@@ -38,7 +38,14 @@ instance ToJSON (Entity Minion) where
   toJSON = entityIdToJSON
 instance ToJSON Minion where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = map toLower . drop 6 }
-instance FromJSON Minion
+instance FromJSON Minion where
+  parseJSON = withObject "coupon" $ \o -> do
+    minionName     <- o .: "name"
+    minionEmail    <- o .: "email"
+    minionPassword <- o .: "password"
+    minionAge      <- o .: "age"
+    minionUpset    <- o .: "upset"
+    return Minion{..}
 
 -- Gymnastics
 
