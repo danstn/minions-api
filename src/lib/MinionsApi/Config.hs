@@ -1,6 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module MinionsApi.Config where
+module MinionsApi.Config
+  ( Config(..)
+  , Environment(..)
+  , makePool      -- IO
+  , lookupSetting -- IO
+  , setLogger
+  , defaultConfig
+  ) where
 
 import System.Environment                   (lookupEnv)
 import Network.Wai.Middleware.RequestLogger (logStdoutDev, logStdout)

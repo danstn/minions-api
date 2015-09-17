@@ -4,7 +4,7 @@ import Network.Wai.Handler.Warp  (run)
 
 import MinionsApi.Service      (app)
 import MinionsApi.Middlewares  (allowCsrf, corsified)
-import MinionsApi.Config       (defaultConfig, Config(..), Environment(..), setLogger, makePool, lookupSetting, lookupDatabaseUrl)
+import MinionsApi.Config       (defaultConfig, Config(..), Environment(..), setLogger, makePool, lookupSetting)
 import MinionsApi.Schema       (runMigrations)
 
 main :: IO ()
