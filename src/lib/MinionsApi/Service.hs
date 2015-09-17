@@ -1,7 +1,7 @@
-{-# LANGUAGE DataKinds     #-}
-{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE TypeOperators     #-}
+{-# LANGUAGE DeriveGeneric     #-}
 
 module MinionsApi.Service where
 
@@ -9,10 +9,10 @@ import Data.Int                    (Int64)
 import GHC.Generics                (Generic)
 import Data.Aeson                  (FromJSON)
 import Control.Monad               (liftM)
-import Control.Monad.Reader        (ReaderT, runReaderT)
-import Control.Monad.Trans.Either  (EitherT)
+import Control.Monad.Reader        (ReaderT, runReaderT, lift)
+import Control.Monad.Trans.Either  (EitherT, left)
 import Network.Wai                 (Application)
-import Database.Persist.Sql        (Entity(..), fromSqlKey, insert, selectList)
+import Database.Persist.Sql        (Entity(..), toSqlKey, fromSqlKey, get, insert, selectList)
 import Servant
 
 import MinionsApi.Config
@@ -22,6 +22,9 @@ type AppM = ReaderT Config (EitherT ServantErr IO)
 type MinionsAPI =
        "minions"
          :> Get '[JSON] [MinionResponse]
+  :<|> "minions"
+         :> Capture "id" Int64
+         :> Get '[JSON] Minion
   :<|> "minions"
          :> ReqBody '[JSON] Minion
          :> Post '[JSON] Int64
@@ -41,11 +44,18 @@ readerToEither :: Config -> AppM :~> EitherT ServantErr IO
 readerToEither cfg = Nat $ \x -> runReaderT x cfg
 
 server :: ServerT MinionsAPI AppM
-server = getMinions :<|> createMinion
+server = getMinions :<|> getMinion :<|> createMinion
 
 ------------------------------
 -- Minion controller functions
 ------------------------------
+
+getMinion :: Int64 -> AppM Minion
+getMinion minionId = do
+  minion <- runDb $ get (toSqlKey minionId)
+  case minion of
+    Just m -> return m
+    Nothing -> lift $ left err404 { errBody = "minion not found" }
 
 getMinions :: AppM [MinionResponse]
 getMinions = runDb $ selectList [] []

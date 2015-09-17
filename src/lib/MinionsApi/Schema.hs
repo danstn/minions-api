@@ -16,8 +16,8 @@ import Data.Char
 import Data.Aeson
 import Data.Aeson.Types
 import GHC.Generics                 (Generic)
-import Control.Monad.Trans.Control  (MonadBaseControl)
-import Control.Monad.Reader         (MonadReader, asks)
+import Control.Monad.IO.Class       (MonadIO)
+import Control.Monad.Reader         (MonadReader, asks, liftIO)
 import Database.Persist             (entityIdToJSON)
 import Database.Persist.Sql         (SqlPersistT, ConnectionPool, Entity(..), runSqlPool, runMigration)
 import Database.Persist.TH          (share, mkPersist, sqlSettings, mkMigrate, persistLowerCase)
@@ -52,5 +52,5 @@ instance FromJSON Minion where
 runMigrations :: ConnectionPool -> IO ()
 runMigrations = runSqlPool (runMigration migrateAll)
 
-runDb :: (MonadReader Config m, MonadBaseControl IO m) => SqlPersistT m b -> m b
-runDb query = asks getPool >>= runSqlPool query
+runDb :: (MonadReader Config m, MonadIO m) => SqlPersistT IO b -> m b
+runDb query = asks getPool >>= liftIO . runSqlPool query
