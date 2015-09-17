@@ -12,7 +12,7 @@ import Control.Monad               (liftM)
 import Control.Monad.Reader        (ReaderT, runReaderT, lift)
 import Control.Monad.Trans.Either  (EitherT, left)
 import Network.Wai                 (Application)
-import Database.Persist.Sql        (Entity(..), toSqlKey, fromSqlKey, get, insert, selectList)
+import Database.Persist.Sql        (Entity(..), toSqlKey, fromSqlKey, get, delete, insert, selectList)
 import Servant
 
 import MinionsApi.Config
@@ -23,11 +23,15 @@ type MinionsAPI =
        "minions"
          :> Get '[JSON] [MinionResponse]
   :<|> "minions"
-         :> Capture "id" Int64
+         :> Capture "minionId" Int64
          :> Get '[JSON] Minion
   :<|> "minions"
          :> ReqBody '[JSON] Minion
          :> Post '[JSON] Int64
+  :<|> "minions"
+         :> Capture "minionId" Int64
+         :> Delete '[JSON] ()
+
 
 type MinionResponse = Entity Minion
 
@@ -44,7 +48,7 @@ readerToEither :: Config -> AppM :~> EitherT ServantErr IO
 readerToEither cfg = Nat $ \x -> runReaderT x cfg
 
 server :: ServerT MinionsAPI AppM
-server = getMinions :<|> getMinion :<|> createMinion
+server = getMinions :<|> getMinion :<|> createMinion :<|> deleteMinion
 
 ------------------------------
 -- Minion controller functions
@@ -62,6 +66,9 @@ getMinions = runDb $ selectList [] []
 
 createMinion :: Minion -> AppM Int64
 createMinion = liftM fromSqlKey . runDb . insert
+
+deleteMinion :: Int64 -> AppM ()
+deleteMinion minionId = runDb $ delete (toSqlKey minionId :: MinionId)
 
 data MinionPayload = MinionPayload { cart :: String } deriving Generic
 instance FromJSON MinionPayload
