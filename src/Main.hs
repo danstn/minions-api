@@ -6,6 +6,7 @@ import MinionsApi.Service      (app)
 import MinionsApi.Middlewares  (allowCsrf, corsified)
 import MinionsApi.Config       (defaultConfig, Config(..), Environment(..), setLogger, makePool, lookupSetting)
 import MinionsApi.Schema       (runMigrations)
+import Network.Helics
 
 main :: IO ()
 main = do
