@@ -31,9 +31,14 @@ type MinionsAPI =
   :<|> "minions"
          :> Capture "minionId" Int64
          :> Delete '[JSON] ()
-
+   :<|> "missions"
+         :> Get '[JSON] [MissionResponse]
+  :<|> "missions"
+         :> ReqBody '[JSON] Mission
+         :> Post '[JSON] Int64
 
 type MinionResponse = Entity Minion
+type MissionResponse = Entity Mission
 
 minionsAPI :: Proxy MinionsAPI
 minionsAPI = Proxy
@@ -48,7 +53,10 @@ readerToEither :: Config -> AppM :~> EitherT ServantErr IO
 readerToEither cfg = Nat $ \x -> runReaderT x cfg
 
 server :: ServerT MinionsAPI AppM
-server = getMinions :<|> getMinion :<|> createMinion :<|> deleteMinion
+server =
+  getMinions :<|> getMinion :<|> createMinion :<|> deleteMinion :<|>
+  getMissions :<|> createMission
+
 
 ------------------------------
 -- Minion controller functions
@@ -72,4 +80,14 @@ deleteMinion minionId = runDb $ delete (toSqlKey minionId :: MinionId)
 
 data MinionPayload = MinionPayload { cart :: String } deriving Generic
 instance FromJSON MinionPayload
+
+------------------------------
+-- Mission controller functions
+------------------------------
+
+getMissions :: AppM [MissionResponse]
+getMissions = runDb $ selectList [] []
+
+createMission :: Mission -> AppM Int64
+createMission = liftM fromSqlKey . runDb . insert
 
