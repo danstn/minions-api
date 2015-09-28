@@ -13,7 +13,6 @@
 module MinionsApi.Schema where
 
 import Data.Char
-import Data.Time
 import Data.Aeson
 import Data.Aeson.Types
 import GHC.Generics                 (Generic)
@@ -43,9 +42,10 @@ Mission
 MinionMission
   minionId  MinionId
   missionId MissionId
-  date      UTCTime
+  UniqueMinionMission minionId missionId
   deriving Show Generic
 |]
+{-date      UTCTime-}
 
 -- Codecs
 

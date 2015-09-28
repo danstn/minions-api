@@ -1,13 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE TypeOperators     #-}
-{-# LANGUAGE DeriveGeneric     #-}
 
 module MinionsApi.Service where
 
 import Data.Int                    (Int64)
-import GHC.Generics                (Generic)
-import Data.Aeson                  (FromJSON)
 import Control.Monad               (liftM)
 import Control.Monad.Reader        (ReaderT, runReaderT, lift)
 import Control.Monad.Trans.Either  (EitherT, left)
@@ -20,6 +17,7 @@ import MinionsApi.Schema
 
 type AppM = ReaderT Config (EitherT ServantErr IO)
 type MinionsAPI =
+  -- Minions
        "minions"
          :> Get '[JSON] [MinionResponse]
   :<|> "minions"
@@ -31,11 +29,17 @@ type MinionsAPI =
   :<|> "minions"
          :> Capture "minionId" Int64
          :> Delete '[JSON] ()
-   :<|> "missions"
+  -- Missions
+  :<|> "missions"
          :> Get '[JSON] [MissionResponse]
   :<|> "missions"
          :> ReqBody '[JSON] Mission
          :> Post '[JSON] Int64
+  -- Assignments
+  :<|> "assign"
+    :> Capture "minionId" Int64
+    :> Capture "missionId" Int64
+    :> Post '[JSON] Int64
 
 type MinionResponse = Entity Minion
 type MissionResponse = Entity Mission
@@ -55,7 +59,8 @@ readerToEither cfg = Nat $ \x -> runReaderT x cfg
 server :: ServerT MinionsAPI AppM
 server =
   getMinions :<|> getMinion :<|> createMinion :<|> deleteMinion :<|>
-  getMissions :<|> createMission
+  getMissions :<|> createMission :<|>
+  assign
 
 
 ------------------------------
@@ -78,8 +83,6 @@ createMinion = liftM fromSqlKey . runDb . insert
 deleteMinion :: Int64 -> AppM ()
 deleteMinion minionId = runDb $ delete (toSqlKey minionId :: MinionId)
 
-data MinionPayload = MinionPayload { cart :: String } deriving Generic
-instance FromJSON MinionPayload
 
 ------------------------------
 -- Mission controller functions
@@ -91,3 +94,16 @@ getMissions = runDb $ selectList [] []
 createMission :: Mission -> AppM Int64
 createMission = liftM fromSqlKey . runDb . insert
 
+
+------------------------------
+-- Assignments controller functions
+------------------------------
+
+createAssignment :: MinionMission -> AppM Int64
+createAssignment = liftM fromSqlKey . runDb . insert
+
+assign :: Int64 -> Int64 -> AppM Int64
+assign minionId missionId =
+  let minionKey = toSqlKey minionId :: MinionId
+      missionKey = toSqlKey missionId :: MissionId
+   in createAssignment $ MinionMission minionKey missionKey
