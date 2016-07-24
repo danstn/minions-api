@@ -16,27 +16,36 @@ from the link above.
 ## Building
 
 ```
+stack build
+```
+
+or
+
+```
 ./scripts/build.sh
 ```
 
 ## Running
 
 ```
-cabal run
+stack exec minionsApi
 ```
 
 or
 
 ```
-stack exec minionsApi
+cabal run
 ```
 
 ## Development
 
+Watch and build changes:
 
-_Note_: Use Stack's `file-watch` instead.
+```
+stack build --file-watch
+```
 
-Install entr (watch app).
+Using entr (watch app):
 
 ```
 brew install entr
@@ -48,7 +57,7 @@ Watch for changes in `src` and auto -rebuild.
 ./scripts/watch.hs
 ```
 
-Some curl commands (until we get to integration tests). `request.json` is in the root of the repo.
+Some curl commands. `request.json` is in the root of the repo.
 
 ```
 curl -i -X POST -d @minion-post.json http://localhost:8081/minions --header "Content-Type:application/json"
@@ -61,11 +70,11 @@ curl -i -X GET http://localhost:8081/minions
 ## Testing
 
 ```
-./scripts/test.sh
+stack test
 ```
 
   or
 
 ```
-stack test
+./scripts/test.sh
 ```
