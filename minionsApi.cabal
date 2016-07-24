@@ -54,7 +54,6 @@ executable minionsApi
   -- Other library packages from which modules are imported.
   build-depends: base
                , warp
-               , helics
                , minionsApi
 
   -- Directories containing source files.
@@ -97,7 +96,6 @@ library
                      , transformers
                      , monad-control
                      , heroku-persistent
-                     , helics
 
 Test-Suite test
   type:                exitcode-stdio-1.0
